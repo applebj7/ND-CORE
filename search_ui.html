@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ND-CORE|Naedam AI Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <div class="logo-container">
+                <img src="logo.png" alt="ND-CORE Logo" class="logo-img">
+                <div class="header-text">
+                    <h1>ND-CORE</h1>
+                    <p>Naedam AI Service</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-box" style="display:none;">
+            <input type="text" id="searchInput" class="search-input" placeholder="검색어를 입력하세요 (예: 보고서, 결산...)"
+                autocomplete="off">
+            <button id="searchBtn" class="search-btn">
+                <i class="fas fa-search" id="searchIcon"></i>
+                <div class="spinner" id="searchSpinner"></div>
+                검색
+            </button>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <!-- Results will be injected here via JavaScript -->
+        </div>
+
+        <div class="back-btn-container" id="backBtnContainer">
+            <button id="backBtn" class="back-btn">
+                <i class="fas fa-arrow-left"></i> 메인 화면으로 돌아가기
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Naedam CnC. Extracting the Core of Your Local Data.</p>
+    </footer>
+
+    <script src="main_js.js"></script>
+</body>
+
+</html>
