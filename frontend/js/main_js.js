@@ -4,12 +4,12 @@
 const API_BASE = 'http://127.0.0.1:5000'; // Flask 백엔드 API 주소
 
 // DOM 참조
-const resultsContainer = document.getElementById('resultsContainer');
+const appContainer = document.getElementById('appContainer');
 const mainContainer = document.getElementById('mainContainer');
 const backBtnContainer = document.getElementById('backBtnContainer');
 const backBtn = document.getElementById('backBtn');
 
-//  아이콘 색상 유틸
+// 아이콘 색상 유틸
 function getIconByName(filename) {
     const ext = filename.split('.').pop().toLowerCase();
     const map = {
@@ -32,18 +32,18 @@ function getIconByName(filename) {
     return map[ext] || 'fa-file';
 }
 
-//  앱 아이콘(홈 화면)
+// 앱 아이콘(홈 화면)
 const APP_LIST = [
-    { name: "파일찾기", icon: "fa-search", color: "blue" },
-    { name: "테스트 1", icon: "fa-vial", color: "green" },
-    { name: "테스트 2", icon: "fa-vial", color: "orange" },
-    { name: "테스트 3", icon: "fa-vial", color: "purple" },
-    { name: "테스트 4", icon: "fa-vial", color: "red" },
-    { name: "테스트 5", icon: "fa-vial", color: "yellow" },
-    { name: "테스트 6", icon: "fa-vial", color: "blue" },
-    { name: "Link", icon: "fa-link", color: "gray" },
-    { name: "Settings", icon: "fa-cog", color: "gray" },
-    { name: "Info", icon: "fa-info-circle", color: "blue" },
+    { id: "file", name: "파일찾기", icon: "fa-search", color: "blue" },
+    { id: "test1", name: "테스트 1", icon: "fa-vial", color: "green" },
+    { id: "test2", name: "테스트 2", icon: "fa-vial", color: "orange" },
+    { id: "test3", name: "테스트 3", icon: "fa-vial", color: "purple" },
+    { id: "test4", name: "테스트 4", icon: "fa-vial", color: "red" },
+    { id: "test5", name: "테스트 5", icon: "fa-vial", color: "yellow" },
+    { id: "test6", name: "테스트 6", icon: "fa-vial", color: "blue" },
+    { id: "link", name: "Link", icon: "fa-link", color: "gray" },
+    { id: "settings", name: "Settings", icon: "fa-cog", color: "gray" },
+    { id: "info", name: "Info", icon: "fa-info-circle", color: "blue" },
 ];
 
 // ─────────────────────────────────────────
@@ -97,14 +97,14 @@ async function router(path) {
 function renderAppGrid() {
     viewContainer.innerHTML = '';
     backBtnContainer.classList.remove('active');
-    resultsContainer.classList.remove('list-view');
-    resultsContainer.classList.add('grid-view');
-    resultsContainer.innerHTML = '';
-    resultsContainer.classList.add('active');
+    appContainer.classList.remove('list-view');
+    appContainer.classList.add('grid-view');
+    appContainer.innerHTML = '';
+    appContainer.classList.add('active');
 
     APP_LIST.forEach(app => {
         let html = '';
-        if (app.name === "파일찾기") {
+        if (app.id === "file") {
             html = `
                 <div class="app-item" id="btnOpenSearch">
                     <div class="app-icon ${app.color}">
@@ -114,9 +114,18 @@ function renderAppGrid() {
                 </div>
             `;
         }
-        else if (app.name === "Link") {
+        else if (app.id === "link") {
             html = `
                 <div class="app-item" id="btnOpenLink">
+                    <div class="app-icon ${app.color}">
+                        <i class="fas ${app.icon}"></i>
+                    </div>
+                    <div class="app-name" title="${app.name}">${app.name}</div>
+                </div>
+            `;
+        } else if (app.id === "settings") {
+            html = `
+                <div class="app-item" id="btnOpenSettings">
                     <div class="app-icon ${app.color}">
                         <i class="fas ${app.icon}"></i>
                     </div>
@@ -134,14 +143,13 @@ function renderAppGrid() {
             `;
         }
 
-        resultsContainer.insertAdjacentHTML('beforeend', html);
+        appContainer.insertAdjacentHTML('beforeend', html);
     });
-
     // [파일찾기] 아이콘 → 검색화면 진입
     const btnOpenSearch = document.getElementById('btnOpenSearch');
     if (btnOpenSearch) {
         btnOpenSearch.addEventListener('click', async () => {
-            await router('./frontend/html/fileSearch.html'); // html render
+            await router('./frontend/html/apps/fileSearch.html'); // html render
             let searchInput = document.getElementById('searchInput');
             let searchBtn = document.getElementById('searchBtn');
             let searchIcon = document.getElementById('searchIcon');
@@ -151,10 +159,13 @@ function renderAppGrid() {
             searchIcon.style.display = 'block';
             searchSpinner.style.display = 'none';
             searchBtn.disabled = false;
-            resultsContainer.innerHTML = '';
             searchInput.focus();
+
+            // Main 영역 init
             backBtnContainer.classList.add('active');
-            resultsContainer.classList.remove('active');
+            appContainer.innerHTML = '';
+            appContainer.classList.remove('active');
+            appContainer.classList.remove('grid-view');
 
             // event
             searchBtn.addEventListener('click', performSearch);
@@ -163,17 +174,96 @@ function renderAppGrid() {
             });
         });
     }
-
     // [Link] 아이콘 → 링크화면 진입
     const btnOpenLink = document.getElementById('btnOpenLink');
     if (btnOpenLink) {
         btnOpenLink.addEventListener('click', async () => {
-            await router('./frontend/html/link.html'); // html render
+            await router('./frontend/html/apps/link.html'); // html render
 
-            // 파일찾기 영역 init
+            let links = [
+                {
+                    icon: "fa-solid fa-building",
+                    name: "NAEDAM C&C",
+                    path: "http://www.ndcc.co.kr/"
+                },
+                {
+                    icon: "fa-solid fa-square-rss",
+                    color: "#000000",
+                    name: "Chat GPT",
+                    path: "https://chatgpt.com/"
+                },
+                {
+                    icon: "fa-solid fa-square-rss",
+                    color: "#319efdff",
+                    name: "GEMINI",
+                    path: "https://gemini.google.com/"
+                },
+                {
+                    icon: "fa-brands fa-youtube",
+                    color: "#ef4444",
+                    name: "Youtube",
+                    path: "https://www.youtube.com/"
+                },
+                {
+                    icon: "fa-brands fa-google",
+                    color: "#3b82f6",
+                    name: "Google",
+                    path: "https://www.google.com/"
+                },
+                {
+                    icon: "fa-brands fa-github",
+                    color: "#000000",
+                    name: "GitHub",
+                    path: "https://github.com/"
+                },
+                {
+                    icon: "fa-solid fa-share-from-square",
+                    color: "#1c7e57ff",
+                    name: "장고실습",
+                    path: "http://127.0.0.1:8000/"
+                },
+            ];
+
+
+            // Main 영역 init
             backBtnContainer.classList.add('active');
-            resultsContainer.classList.remove('active');
+            appContainer.classList.remove('active');
+            appContainer.classList.remove('grid-view');
+            appContainer.innerHTML = '';
+
+            // link 리스트 set
+            const resultsContainer = document.getElementById('resultsContainer');
             resultsContainer.innerHTML = '';
+            resultsContainer.classList.add('active');
+            resultsContainer.classList.add('list-view');
+            links.forEach(link => {
+                resultsContainer.insertAdjacentHTML('beforeend', renderLinkResult(link));
+            });
+
+            // 정확히 3개 아이템 높이 기준으로 maxHeight 동적 적용
+            let items = resultsContainer.querySelectorAll('.result-item');
+            if (items.length > 3) {
+                // 결과 클릭 → 파일 탐색기에서 열기
+                items.forEach(el => {
+                    el.addEventListener('click', () => {
+                        const path = el.dataset.path;
+                        if (path) openInNewWindow(path);
+                    });
+                });
+
+                // 3번째 아이템의 하단 위치 = 컨테이너 상단 기준 offsetTop + offsetHeight
+                const containerTop = resultsContainer.getBoundingClientRect().top + resultsContainer.scrollTop;
+                const thirdItem = items[2];
+                const thirdBottom = thirdItem.getBoundingClientRect().bottom - resultsContainer.getBoundingClientRect().top + resultsContainer.scrollTop;
+                resultsContainer.style.maxHeight = thirdBottom + 'px';
+            }
+        });
+    }
+    // [Settings] 아이콘 → 링크화면 진입
+    const btnOpenSettings = document.getElementById('btnOpenSettings');
+    if (btnOpenSettings) {
+        btnOpenSettings.addEventListener('click', () => {
+            alert('Settings');
         });
     }
 
@@ -186,6 +276,8 @@ function renderAppGrid() {
 // 실제 검색: Flask API 호출
 const performSearch = async () => {
     const query = searchInput.value.trim();
+    const resultsContainer = document.getElementById('resultsContainer');
+
 
     // 검색어 없으면 → toast 메시지
     if (!query) {
@@ -205,6 +297,7 @@ const performSearch = async () => {
     resultsContainer.style.overflowY = 'auto';
 
     try {
+        // app.py → search 호출
         const response = await fetch(`${API_BASE}/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -284,7 +377,7 @@ async function openInExplorer(path) {
     }
 }
 
-//  검색어 하이라이트
+// 검색어 하이라이트
 function highlightMatch(text, query) {
     if (!query) return text;
     const index = text.toLowerCase().indexOf(query.toLowerCase());
@@ -311,7 +404,7 @@ function getIconColorHex(iconClass) {
     return '#60a5fa';
 }
 
-//  검색 결과 렌더링 (목록형)
+// 검색 결과 렌더링 (목록형)
 function renderFileResult(item, query) {
     const icon = getIconByName(item.name);
     const iconColor = getIconColorHex(icon);
@@ -338,4 +431,42 @@ function renderFileResult(item, query) {
             </div>
         </div>
     `;
+}
+
+// ─────────────────────────────────────────
+// 03. 링크
+// ─────────────────────────────────────────
+
+// 링크 렌더링 (목록형)
+function renderLinkResult(item) {
+    let color = '';
+    if (item.color == '' || item.color == null) {
+        color = '#1278a4ff';
+    } else {
+        color = item.color;
+    }
+    return `
+        <div class="result-item" data-path="${item.path}" title="${item.name}">
+            <div class="file-icon" style="color:${color};background:#ffffff;">
+                <i class="${item.icon}"></i>
+            </div>
+            <div class="file-info">
+                <div class="file-name">${item.name}</div>
+                <div class="file-meta">
+                    <span class="file-path" title="${item.path}">
+                        <i class="fas fa-link" style="margin-right:4px;"></i>${item.path}
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+// 새 창에서 링크 열기
+async function openInNewWindow(path) {
+    try {
+        window.open(path, '_blank');
+    } catch (e) {
+        showToast('링크를 여는 중 문제가 발생했습니다.', 'error');
+    }
 }

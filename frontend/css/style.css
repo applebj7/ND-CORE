@@ -192,6 +192,50 @@ body {
     }
 }
 
+/* app-container */
+.app-container {
+    display: none;
+    gap: 0.8rem;
+}
+
+.app-container.active {
+    display: flex;
+}
+
+/* App Grid Layout */
+.app-container.grid-view {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+/* List Layout for search results */
+.app-container.list-view {
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* 스크롤바 스타일 (다크모드) */
+.app-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.app-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+}
+
+.app-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+}
+
+.app-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 /* Results Container */
 .results-container {
     display: none;
@@ -199,6 +243,7 @@ body {
 }
 
 .results-container.active {
+    margin-top: 10px;
     display: flex;
 }
 
