@@ -26,24 +26,18 @@
                 </div>
             </div>
         </div>
-        <!-- [파일찾기] 검색영역 -->
-        <div class="search-box" style="display:none;">
-            <input type="text" id="searchInput" class="search-input" placeholder="검색어를 입력하세요 (예: 보고서, 결산...)"
-                autocomplete="off">
-            <button id="searchBtn" class="search-btn">
-                <i class="fas fa-search" id="searchIcon"></i>
-                <div class="spinner" id="searchSpinner"></div>
-                검색
-            </button>
-        </div>
 
+        <!-- app html 랜더영역 -->
+        <div id="viewContainer">
+
+        </div>
         <div class="results-container" id="resultsContainer">
             <!-- Results will be injected here via JavaScript -->
         </div>
 
         <div class="back-btn-container" id="backBtnContainer">
             <button id="backBtn" class="back-btn">
-                <i class="fas fa-arrow-left"></i> 메인 화면으로 돌아가기
+                <i class="fas fa-arrow-left"></i> 돌아가기
             </button>
         </div>
     </div>

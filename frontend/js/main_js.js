@@ -1,22 +1,15 @@
 // ─────────────────────────────────────────
-//  설정: Flask 백엔드 API 주소
+// 00. 설정
 // ─────────────────────────────────────────
-const API_BASE = 'http://127.0.0.1:5000';
+const API_BASE = 'http://127.0.0.1:5000'; // Flask 백엔드 API 주소
 
 // DOM 참조
-const searchInput = document.getElementById('searchInput');
-const searchBtn = document.getElementById('searchBtn');
-const searchIcon = document.getElementById('searchIcon');
-const searchSpinner = document.getElementById('searchSpinner');
 const resultsContainer = document.getElementById('resultsContainer');
 const mainContainer = document.getElementById('mainContainer');
-const searchBox = document.querySelector('.search-box');
 const backBtnContainer = document.getElementById('backBtnContainer');
 const backBtn = document.getElementById('backBtn');
 
-// ─────────────────────────────────────────
 //  아이콘 색상 유틸
-// ─────────────────────────────────────────
 function getIconByName(filename) {
     const ext = filename.split('.').pop().toLowerCase();
     const map = {
@@ -39,68 +32,7 @@ function getIconByName(filename) {
     return map[ext] || 'fa-file';
 }
 
-function getIconColorHex(iconClass) {
-    if (iconClass.includes('excel') || iconClass.includes('csv')) return '#22c55e';
-    if (iconClass.includes('powerpoint')) return '#f97316';
-    if (iconClass.includes('word')) return '#3b82f6';
-    if (iconClass.includes('pdf')) return '#ef4444';
-    if (iconClass.includes('image')) return '#a855f7';
-    if (iconClass.includes('code')) return '#eab308';
-    if (iconClass.includes('archive')) return '#f97316';
-    if (iconClass.includes('video')) return '#06b6d4';
-    if (iconClass.includes('audio')) return '#ec4899';
-    return '#60a5fa';
-}
-
-// ─────────────────────────────────────────
-//  검색어 하이라이트
-// ─────────────────────────────────────────
-function highlightMatch(text, query) {
-    if (!query) return text;
-    const index = text.toLowerCase().indexOf(query.toLowerCase());
-    if (index >= 0) {
-        const before = text.substring(0, index);
-        const match = text.substring(index, index + query.length);
-        const after = text.substring(index + query.length);
-        return `${before}<span style="color:#60a5fa;font-weight:bold;background:rgba(96,165,250,0.2);border-radius:4px;padding:0 2px;">${match}</span>${after}`;
-    }
-    return text;
-}
-
-// ─────────────────────────────────────────
-//  검색 결과 렌더링 (목록형)
-// ─────────────────────────────────────────
-function renderFileResult(item, query) {
-    const icon = getIconByName(item.name);
-    const iconColor = getIconColorHex(icon);
-    const fileDir = item.path.replace(/[\\/][^\\/]+$/, ''); // 경로에서 파일명 제거
-
-    return `
-        <div class="result-item" data-path="${item.path}" title="클릭하여 탐색기에서 열기">
-            <div class="file-icon" style="color:${iconColor};background:${iconColor}22;">
-                <i class="fas ${icon}"></i>
-            </div>
-            <div class="file-info">
-                <div class="file-name">${highlightMatch(item.name, query)}</div>
-                <div class="file-meta">
-                    <span class="file-size">${item.size}</span>
-                    <span class="file-path" title="${fileDir}">
-                        <i class="fas fa-folder-open" style="margin-right:4px;"></i>${fileDir}
-                    </span>
-                </div>
-                <div class="file-meta" style="margin-top:0.3rem;">
-                    <span class="file-modified" title="최종 수정일">
-                        <i class="far fa-clock" style="margin-right:4px;"></i>${item.modified}
-                    </span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// ─────────────────────────────────────────
-//  앱 아이콘 그리기 (홈 화면)
-// ─────────────────────────────────────────
+//  앱 아이콘(홈 화면)
 const APP_LIST = [
     { name: "파일찾기", icon: "fa-search", color: "blue" },
     { name: "테스트 1", icon: "fa-vial", color: "green" },
@@ -115,10 +47,55 @@ const APP_LIST = [
 ];
 
 // ─────────────────────────────────────────
-//  앱 아이콘 EVENT 매핑
+// 01. 공통, 메인
 // ─────────────────────────────────────────
+
+// 초기 로딩
+document.addEventListener('DOMContentLoaded', () => {
+    renderAppGrid(); // 홈 화면(앱 그리드)
+});
+
+// 뒤로가기 버튼
+if (backBtn) {
+    backBtn.addEventListener('click', () => {
+        renderAppGrid();
+    });
+}
+
+// Toast 메시지
+const showToast = (message, type) => {
+    let toast = document.getElementById('toast');
+    toast.textContent = message; // 메시지 설정
+    if (type === 'error') {
+        toast.className = "toast error show";
+    } else if (type === 'info') {
+        toast.className = "toast info show";
+    } else if (type === 'success') {
+        toast.className = "toast success show";
+    } else {
+        toast.className = "toast show";
+    }
+    setTimeout(() => {
+        toast.className = toast.className.replace("show", "");
+    }, 1000);
+};
+
+// HTML 부분랜더
+async function router(path) {
+    const container = document.getElementById('viewContainer');
+    try {
+        const res = await fetch(path);
+        const html = await res.text();
+        container.innerHTML = html;
+        return true; // 성공적으로 렌더링됨을 알림
+    } catch (err) {
+        showToast('HTML 렌더링 오류', 'error');
+    }
+}
+
+// 앱 아이콘 EVENT 매핑
 function renderAppGrid() {
-    searchBox.style.display = 'none';
+    viewContainer.innerHTML = '';
     backBtnContainer.classList.remove('active');
     resultsContainer.classList.remove('list-view');
     resultsContainer.classList.add('grid-view');
@@ -160,27 +137,53 @@ function renderAppGrid() {
         resultsContainer.insertAdjacentHTML('beforeend', html);
     });
 
-    // 파일찾기 아이콘 → 검색화면 진입
+    // [파일찾기] 아이콘 → 검색화면 진입
     const btnOpenSearch = document.getElementById('btnOpenSearch');
     if (btnOpenSearch) {
-        btnOpenSearch.addEventListener('click', () => {
-            searchBox.style.display = 'flex';
-            backBtnContainer.classList.add('active');
-            resultsContainer.classList.remove('active');
+        btnOpenSearch.addEventListener('click', async () => {
+            await router('./frontend/html/fileSearch.html'); // html render
+            let searchInput = document.getElementById('searchInput');
+            let searchBtn = document.getElementById('searchBtn');
+            let searchIcon = document.getElementById('searchIcon');
+            let searchSpinner = document.getElementById('searchSpinner');
+
+            // 파일찾기 영역 init
+            searchIcon.style.display = 'block';
+            searchSpinner.style.display = 'none';
+            searchBtn.disabled = false;
             resultsContainer.innerHTML = '';
             searchInput.focus();
+            backBtnContainer.classList.add('active');
+            resultsContainer.classList.remove('active');
+
+            // event
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', e => {
+                if (e.key === 'Enter') performSearch();
+            });
         });
     }
 
-    // 로딩 상태 복구
-    searchIcon.style.display = 'block';
-    searchSpinner.style.display = 'none';
-    searchBtn.disabled = false;
+    // [Link] 아이콘 → 링크화면 진입
+    const btnOpenLink = document.getElementById('btnOpenLink');
+    if (btnOpenLink) {
+        btnOpenLink.addEventListener('click', async () => {
+            await router('./frontend/html/link.html'); // html render
+
+            // 파일찾기 영역 init
+            backBtnContainer.classList.add('active');
+            resultsContainer.classList.remove('active');
+            resultsContainer.innerHTML = '';
+        });
+    }
+
 }
 
 // ─────────────────────────────────────────
-//  실제 검색: Flask API 호출
+// 02. 파일찾기
 // ─────────────────────────────────────────
+
+// 실제 검색: Flask API 호출
 const performSearch = async () => {
     const query = searchInput.value.trim();
 
@@ -268,9 +271,7 @@ const performSearch = async () => {
     }
 };
 
-// ─────────────────────────────────────────
-//  탐색기에서 파일 열기 (Flask API 활용)
-// ─────────────────────────────────────────
+// 탐색기에서 파일 열기 (Flask API 활용)
 async function openInExplorer(path) {
     try {
         await fetch(`${API_BASE}/open_explorer`, {
@@ -283,43 +284,58 @@ async function openInExplorer(path) {
     }
 }
 
-// ─────────────────────────────────────────
-//  이벤트 리스너
-// ─────────────────────────────────────────
-searchBtn.addEventListener('click', performSearch);
-searchInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') performSearch();
-});
-
-// 뒤로가기 버튼
-if (backBtn) {
-    backBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        renderAppGrid();
-    });
+//  검색어 하이라이트
+function highlightMatch(text, query) {
+    if (!query) return text;
+    const index = text.toLowerCase().indexOf(query.toLowerCase());
+    if (index >= 0) {
+        const before = text.substring(0, index);
+        const match = text.substring(index, index + query.length);
+        const after = text.substring(index + query.length);
+        return `${before}<span style="color:#60a5fa;font-weight:bold;background:rgba(96,165,250,0.2);border-radius:4px;padding:0 2px;">${match}</span>${after}`;
+    }
+    return text;
 }
 
-// 초기 로딩 → 홈 화면(앱 그리드)
-document.addEventListener('DOMContentLoaded', () => {
-    renderAppGrid();
-});
+// 확장자 아이콘
+function getIconColorHex(iconClass) {
+    if (iconClass.includes('excel') || iconClass.includes('csv')) return '#22c55e';
+    if (iconClass.includes('powerpoint')) return '#f97316';
+    if (iconClass.includes('word')) return '#3b82f6';
+    if (iconClass.includes('pdf')) return '#ef4444';
+    if (iconClass.includes('image')) return '#a855f7';
+    if (iconClass.includes('code')) return '#eab308';
+    if (iconClass.includes('archive')) return '#f97316';
+    if (iconClass.includes('video')) return '#06b6d4';
+    if (iconClass.includes('audio')) return '#ec4899';
+    return '#60a5fa';
+}
 
-// ─────────────────────────────────────────
-// Toast 메시지
-// ─────────────────────────────────────────
-const showToast = (message, type) => {
-    let toast = document.getElementById('toast');
-    toast.textContent = message; // 메시지 설정
-    if (type === 'error') {
-        toast.className = "toast error show";
-    } else if (type === 'info') {
-        toast.className = "toast info show";
-    } else if (type === 'success') {
-        toast.className = "toast success show";
-    } else {
-        toast.className = "toast show";
-    }
-    setTimeout(() => {
-        toast.className = toast.className.replace("show", "");
-    }, 1000);
-};
+//  검색 결과 렌더링 (목록형)
+function renderFileResult(item, query) {
+    const icon = getIconByName(item.name);
+    const iconColor = getIconColorHex(icon);
+    const fileDir = item.path.replace(/[\\/][^\\/]+$/, ''); // 경로에서 파일명 제거
+
+    return `
+        <div class="result-item" data-path="${item.path}" title="클릭하여 탐색기에서 열기">
+            <div class="file-icon" style="color:${iconColor};background:${iconColor}22;">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div class="file-info">
+                <div class="file-name">${highlightMatch(item.name, query)}</div>
+                <div class="file-meta">
+                    <span class="file-size">${item.size}</span>
+                    <span class="file-path" title="${fileDir}">
+                        <i class="fas fa-folder-open" style="margin-right:4px;"></i>${fileDir}
+                    </span>
+                </div>
+                <div class="file-meta" style="margin-top:0.3rem;">
+                    <span class="file-modified" title="최종 수정일">
+                        <i class="far fa-clock" style="margin-right:4px;"></i>${item.modified}
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+}
