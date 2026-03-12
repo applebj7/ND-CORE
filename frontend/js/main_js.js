@@ -4,15 +4,15 @@
 const API_BASE = 'http://127.0.0.1:5000';
 
 // DOM 참조
-const searchInput        = document.getElementById('searchInput');
-const searchBtn          = document.getElementById('searchBtn');
-const searchIcon         = document.getElementById('searchIcon');
-const searchSpinner      = document.getElementById('searchSpinner');
-const resultsContainer   = document.getElementById('resultsContainer');
-const mainContainer      = document.getElementById('mainContainer');
-const searchBox          = document.querySelector('.search-box');
-const backBtnContainer   = document.getElementById('backBtnContainer');
-const backBtn            = document.getElementById('backBtn');
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const searchIcon = document.getElementById('searchIcon');
+const searchSpinner = document.getElementById('searchSpinner');
+const resultsContainer = document.getElementById('resultsContainer');
+const mainContainer = document.getElementById('mainContainer');
+const searchBox = document.querySelector('.search-box');
+const backBtnContainer = document.getElementById('backBtnContainer');
+const backBtn = document.getElementById('backBtn');
 
 // ─────────────────────────────────────────
 //  아이콘 색상 유틸
@@ -20,35 +20,35 @@ const backBtn            = document.getElementById('backBtn');
 function getIconByName(filename) {
     const ext = filename.split('.').pop().toLowerCase();
     const map = {
-        xlsx: 'fa-file-excel',   xls: 'fa-file-excel',
-        csv:  'fa-file-csv',
+        xlsx: 'fa-file-excel', xls: 'fa-file-excel',
+        csv: 'fa-file-csv',
         pptx: 'fa-file-powerpoint', ppt: 'fa-file-powerpoint',
-        docx: 'fa-file-word',    doc: 'fa-file-word',
-        pdf:  'fa-file-pdf',
-        png:  'fa-file-image',   jpg: 'fa-file-image',
-        gif:  'fa-file-image',   bmp: 'fa-file-image',
-        js:   'fa-file-code',    ts: 'fa-file-code',
-        py:   'fa-file-code',    html: 'fa-file-code',
-        css:  'fa-file-code',    java: 'fa-file-code',
-        md:   'fa-file-alt',     txt: 'fa-file-alt',
-        json: 'fa-file-alt',     xml: 'fa-file-alt',
-        zip:  'fa-file-archive', rar: 'fa-file-archive',
-        mp4:  'fa-file-video',   avi: 'fa-file-video',
-        mp3:  'fa-file-audio',
+        docx: 'fa-file-word', doc: 'fa-file-word',
+        pdf: 'fa-file-pdf',
+        png: 'fa-file-image', jpg: 'fa-file-image',
+        gif: 'fa-file-image', bmp: 'fa-file-image',
+        js: 'fa-file-code', ts: 'fa-file-code',
+        py: 'fa-file-code', html: 'fa-file-code',
+        css: 'fa-file-code', java: 'fa-file-code',
+        md: 'fa-file-alt', txt: 'fa-file-alt',
+        json: 'fa-file-alt', xml: 'fa-file-alt',
+        zip: 'fa-file-archive', rar: 'fa-file-archive',
+        mp4: 'fa-file-video', avi: 'fa-file-video',
+        mp3: 'fa-file-audio',
     };
     return map[ext] || 'fa-file';
 }
 
 function getIconColorHex(iconClass) {
-    if (iconClass.includes('excel') || iconClass.includes('csv'))       return '#22c55e';
-    if (iconClass.includes('powerpoint'))                               return '#f97316';
-    if (iconClass.includes('word'))                                     return '#3b82f6';
-    if (iconClass.includes('pdf'))                                      return '#ef4444';
-    if (iconClass.includes('image'))                                    return '#a855f7';
-    if (iconClass.includes('code'))                                     return '#eab308';
-    if (iconClass.includes('archive'))                                  return '#f97316';
-    if (iconClass.includes('video'))                                    return '#06b6d4';
-    if (iconClass.includes('audio'))                                    return '#ec4899';
+    if (iconClass.includes('excel') || iconClass.includes('csv')) return '#22c55e';
+    if (iconClass.includes('powerpoint')) return '#f97316';
+    if (iconClass.includes('word')) return '#3b82f6';
+    if (iconClass.includes('pdf')) return '#ef4444';
+    if (iconClass.includes('image')) return '#a855f7';
+    if (iconClass.includes('code')) return '#eab308';
+    if (iconClass.includes('archive')) return '#f97316';
+    if (iconClass.includes('video')) return '#06b6d4';
+    if (iconClass.includes('audio')) return '#ec4899';
     return '#60a5fa';
 }
 
@@ -60,8 +60,8 @@ function highlightMatch(text, query) {
     const index = text.toLowerCase().indexOf(query.toLowerCase());
     if (index >= 0) {
         const before = text.substring(0, index);
-        const match  = text.substring(index, index + query.length);
-        const after  = text.substring(index + query.length);
+        const match = text.substring(index, index + query.length);
+        const after = text.substring(index + query.length);
         return `${before}<span style="color:#60a5fa;font-weight:bold;background:rgba(96,165,250,0.2);border-radius:4px;padding:0 2px;">${match}</span>${after}`;
     }
     return text;
@@ -71,9 +71,9 @@ function highlightMatch(text, query) {
 //  검색 결과 렌더링 (목록형)
 // ─────────────────────────────────────────
 function renderFileResult(item, query) {
-    const icon      = getIconByName(item.name);
+    const icon = getIconByName(item.name);
     const iconColor = getIconColorHex(icon);
-    const fileDir   = item.path.replace(/[\\/][^\\/]+$/, ''); // 경로에서 파일명 제거
+    const fileDir = item.path.replace(/[\\/][^\\/]+$/, ''); // 경로에서 파일명 제거
 
     return `
         <div class="result-item" data-path="${item.path}" title="클릭하여 탐색기에서 열기">
@@ -102,18 +102,21 @@ function renderFileResult(item, query) {
 //  앱 아이콘 그리기 (홈 화면)
 // ─────────────────────────────────────────
 const APP_LIST = [
-    { name: "파일찾기",  icon: "fa-search",       color: "blue"   },
-    { name: "테스트 1",  icon: "fa-vial",          color: "green"  },
-    { name: "테스트 2",  icon: "fa-vial",          color: "orange" },
-    { name: "테스트 3",  icon: "fa-vial",          color: "purple" },
-    { name: "테스트 4",  icon: "fa-vial",          color: "red"    },
-    { name: "테스트 5",  icon: "fa-vial",          color: "yellow" },
-    { name: "테스트 6",  icon: "fa-vial",          color: "blue"   },
-    { name: "테스트 7",  icon: "fa-vial",          color: "gray"   },
-    { name: "Settings", icon: "fa-cog",            color: "gray"   },
-    { name: "Info",      icon: "fa-info-circle",   color: "blue"   },
+    { name: "파일찾기", icon: "fa-search", color: "blue" },
+    { name: "테스트 1", icon: "fa-vial", color: "green" },
+    { name: "테스트 2", icon: "fa-vial", color: "orange" },
+    { name: "테스트 3", icon: "fa-vial", color: "purple" },
+    { name: "테스트 4", icon: "fa-vial", color: "red" },
+    { name: "테스트 5", icon: "fa-vial", color: "yellow" },
+    { name: "테스트 6", icon: "fa-vial", color: "blue" },
+    { name: "Link", icon: "fa-link", color: "gray" },
+    { name: "Settings", icon: "fa-cog", color: "gray" },
+    { name: "Info", icon: "fa-info-circle", color: "blue" },
 ];
 
+// ─────────────────────────────────────────
+//  앱 아이콘 EVENT 매핑
+// ─────────────────────────────────────────
 function renderAppGrid() {
     searchBox.style.display = 'none';
     backBtnContainer.classList.remove('active');
@@ -123,15 +126,37 @@ function renderAppGrid() {
     resultsContainer.classList.add('active');
 
     APP_LIST.forEach(app => {
-        const isSearchApp = app.name === "파일찾기";
-        const html = `
-            <div class="app-item" ${isSearchApp ? 'id="btnOpenSearch"' : ''}>
-                <div class="app-icon ${app.color}">
-                    <i class="fas ${app.icon}"></i>
+        let html = '';
+        if (app.name === "파일찾기") {
+            html = `
+                <div class="app-item" id="btnOpenSearch">
+                    <div class="app-icon ${app.color}">
+                        <i class="fas ${app.icon}"></i>
+                    </div>
+                    <div class="app-name" title="${app.name}">${app.name}</div>
                 </div>
-                <div class="app-name" title="${app.name}">${app.name}</div>
-            </div>
-        `;
+            `;
+        }
+        else if (app.name === "Link") {
+            html = `
+                <div class="app-item" id="btnOpenLink">
+                    <div class="app-icon ${app.color}">
+                        <i class="fas ${app.icon}"></i>
+                    </div>
+                    <div class="app-name" title="${app.name}">${app.name}</div>
+                </div>
+            `;
+        } else {
+            html = `
+                <div class="app-item">
+                    <div class="app-icon ${app.color}">
+                        <i class="fas ${app.icon}"></i>
+                    </div>
+                    <div class="app-name" title="${app.name}">${app.name}</div>
+                </div>
+            `;
+        }
+
         resultsContainer.insertAdjacentHTML('beforeend', html);
     });
 
@@ -159,9 +184,9 @@ function renderAppGrid() {
 const performSearch = async () => {
     const query = searchInput.value.trim();
 
-    // 검색어 없으면 → 홈 화면
+    // 검색어 없으면 → toast 메시지
     if (!query) {
-        renderAppGrid();
+        showToast('검색어를 입력하세요.', 'info');
         return;
     }
 
@@ -278,3 +303,23 @@ if (backBtn) {
 document.addEventListener('DOMContentLoaded', () => {
     renderAppGrid();
 });
+
+// ─────────────────────────────────────────
+// Toast 메시지
+// ─────────────────────────────────────────
+const showToast = (message, type) => {
+    let toast = document.getElementById('toast');
+    toast.textContent = message; // 메시지 설정
+    if (type === 'error') {
+        toast.className = "toast error show";
+    } else if (type === 'info') {
+        toast.className = "toast info show";
+    } else if (type === 'success') {
+        toast.className = "toast success show";
+    } else {
+        toast.className = "toast show";
+    }
+    setTimeout(() => {
+        toast.className = toast.className.replace("show", "");
+    }, 1000);
+};
