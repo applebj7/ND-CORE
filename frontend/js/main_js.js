@@ -182,9 +182,22 @@ function renderAppGrid() {
 
             let links = [
                 {
-                    icon: "fa-solid fa-building",
-                    name: "NAEDAM C&C",
-                    path: "http://www.ndcc.co.kr/"
+                    icon: "fa-brands fa-github",
+                    color: "#000000",
+                    name: "GitHub > ND-CORE",
+                    path: "https://github.com/applebj7/ND-CORE"
+                },
+                {
+                    icon: "fa-brands fa-google",
+                    color: "#3b82f6",
+                    name: "Google",
+                    path: "https://www.google.com/"
+                },
+                {
+                    icon: "fa-solid fa-graduation-cap",
+                    color: "#aac4edff",
+                    name: "KOSTA EDU",
+                    path: "https://edu3.kosta.or.kr/"
                 },
                 {
                     icon: "fa-solid fa-square-rss",
@@ -205,16 +218,9 @@ function renderAppGrid() {
                     path: "https://www.youtube.com/"
                 },
                 {
-                    icon: "fa-brands fa-google",
-                    color: "#3b82f6",
-                    name: "Google",
-                    path: "https://www.google.com/"
-                },
-                {
-                    icon: "fa-brands fa-github",
-                    color: "#000000",
-                    name: "GitHub",
-                    path: "https://github.com/"
+                    icon: "fa-solid fa-building",
+                    name: "NAEDAM C&C",
+                    path: "http://www.ndcc.co.kr/"
                 },
                 {
                     icon: "fa-solid fa-share-from-square",
@@ -276,8 +282,9 @@ function renderAppGrid() {
 // 실제 검색: Flask API 호출
 const performSearch = async () => {
     const query = searchInput.value.trim();
+    const searchTypeEl = document.getElementById('searchType');
+    const searchType = searchTypeEl ? searchTypeEl.value : 'name';
     const resultsContainer = document.getElementById('resultsContainer');
-
 
     // 검색어 없으면 → toast 메시지
     if (!query) {
@@ -301,7 +308,7 @@ const performSearch = async () => {
         const response = await fetch(`${API_BASE}/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: query.toLowerCase(), searchType: 'name' })
+            body: JSON.stringify({ query: query.toLowerCase(), searchType: searchType })
         });
 
         if (!response.ok) throw new Error(`서버 오류: ${response.status}`);
@@ -428,6 +435,14 @@ function renderFileResult(item, query) {
                         <i class="far fa-clock" style="margin-right:4px;"></i>${item.modified}
                     </span>
                 </div>
+                ${item.snippet ? (() => {
+            const escaped = item.snippet.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const highlighted = escaped.replace(
+                new RegExp(query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi'),
+                match => `<span style="color:#60a5fa;font-weight:bold;background:rgba(96,165,250,0.2);border-radius:4px;padding:0 2px;">${match}</span>`
+            );
+            return `<div class="file-snippet">${highlighted}</div>`;
+        })() : ''}
             </div>
         </div>
     `;
